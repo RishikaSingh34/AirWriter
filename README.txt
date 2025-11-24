@@ -1,0 +1,13 @@
+AirWriter is basically a small Python project that turns your webcam into something like a floating drawing pad. You just point your finger in the air and the program follows it and draws whatever shape you trace. You don’t need any special gear, no VR gloves or external sensors. Just your hand and a webcam that hopefully isn’t struggling with bad lighting.
+
+The whole thing runs using OpenCV and MediaPipe, plus a bit of custom logic to make it behave in a way that feels natural. MediaPipe handles the hand tracking part. It looks at each webcam frame and tries to identify your hand and the different finger points. I set the confidence level fairly high, around 0.8, so it doesn’t start detecting random background objects by mistake.
+
+Out of all the finger points MediaPipe gives, the ones that actually matter here are the tip of the index finger, which acts like the pen, and the tip of the middle finger, which helps switch between drawing and selecting. To figure out what you’re trying to do, the program checks how far apart those two fingertips are. If they’re far apart, it assumes you want to draw. If they’re close together, sort of like a pinch, drawing pauses and you can move around freely to pick colors, clear the screen, and so on.
+
+Behind the scenes there are two layers: the regular webcam feed, and a plain black canvas made with NumPy, which is where all the drawing actually happens. Every frame, the canvas gets combined with the video feed using some OpenCV bitwise operations. It’s kind of like having a transparent sheet placed on top of your camera image, and that sheet is where all your lines appear.
+
+One issue with finger tracking is that small hand shakes or slight camera jitter can make the lines look messy. To smooth things out, the program stores the most recent positions of your finger in a deque and draws lines between them. That way the strokes look smoother and more natural instead of jumpy.
+
+To run everything, you just need Python 3.7 or newer and a working webcam. You go to the folder with airwriter.py in it and install the dependencies using the requirements file. If something doesn’t install correctly, you can install OpenCV, NumPy, and MediaPipe manually with pip. Once that’s done, you can just run the script, and it should open your webcam automatically.
+
+If the camera doesn’t open, usually another program is using it, or you might need to change the camera index from zero to one if you have more than one device. If the tracking looks bad, bright lighting usually fixes most issues since MediaPipe has a much easier time recognizing the hand when it’s well lit.
